@@ -1,7 +1,5 @@
 package br.com.leolimaf.minesweeper.model;
 
-import br.com.leolimaf.minesweeper.exception.ExplosionException;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,10 +13,19 @@ public class Field {
     private boolean marked;
 
     private List<Field> neighbors = new ArrayList<>();
+    private List<ObserverField> observers = new ArrayList<>();
 
     public Field(int line, int column) {
         this.line = line;
         this.column = column;
+    }
+
+    public void registerObserver(ObserverField observer){
+        observers.add(observer);
+    }
+
+    private void notifyObservers(EventField event){
+        observers.forEach(observerField -> observerField.eventOccurred(this, event));
     }
 
     public int getLine() {
@@ -30,7 +37,14 @@ public class Field {
     }
 
     void changeMarkup() {
-        if (!open) marked = !marked;
+        if (!open){
+            marked = !marked;
+            if (marked){
+                notifyObservers(EventField.MARK);
+            } else {
+                notifyObservers(EventField.MARKOFF);
+            }
+        }
     }
 
     public boolean isMarked() {
@@ -59,19 +73,20 @@ public class Field {
         if (generalDelta == 1 && !isDiagonal) {
             neighbors.add(neighbor);
         }
-        if (generalDelta == 2 && isDiagonal){
+        if (generalDelta == 2 && isDiagonal) {
             neighbors.add(neighbor);
         }
     }
 
-    boolean open(){
-        if (!open && !marked){
-            open = true;
+    boolean open() {
+        if (!open && !marked) {
 
-            if (undermined){
-                throw new ExplosionException();
+            if (undermined) {
+                notifyObservers(EventField.EXPLODE);
+                return true;
             }
-            if (safeNeighborhood()){
+            setOpen(true);
+            if (safeNeighborhood()) {
                 neighbors.forEach(Field::open);
             }
             return true;
@@ -81,22 +96,22 @@ public class Field {
 
     }
 
-    boolean safeNeighborhood(){
+    boolean safeNeighborhood() {
         return neighbors.stream().noneMatch(field -> field.undermined);
     }
 
-    boolean goalAchieved(){
+    boolean goalAchieved() {
         boolean unveiled = open && !undermined;
         boolean protected_ = marked && undermined;
 
         return unveiled || protected_;
     }
 
-    long minesInTheNeighborhood(){
+    long minesInTheNeighborhood() {
         return neighbors.stream().filter(field -> field.undermined).count();
     }
 
-    void restart(){
+    void restart() {
         open = false;
         undermined = false;
         marked = false;
@@ -104,5 +119,8 @@ public class Field {
 
     public void setOpen(boolean open) {
         this.open = open;
+        if (open){
+            notifyObservers(EventField.OPEN);
+        }
     }
 }

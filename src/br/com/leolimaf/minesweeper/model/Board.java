@@ -46,11 +46,24 @@ public class Board {
         } while (armedMines < mines);
     }
 
-    public boolean goalAchieved(){
+    public void open(int line, int column) {
+        try {
+            fields.parallelStream()
+                    .filter(field -> field.getLine() == line && field.getColumn() == column)
+                    .findFirst()
+                    .ifPresent(Field::open);
+        } catch (Exception e) {
+            //FIXME
+            fields.forEach(field -> field.setOpen(true));
+            throw e;
+        }
+    }
+
+    public boolean goalAchieved() {
         return fields.stream().allMatch(Field::goalAchieved);
     }
 
-    public void restart(){
+    public void restart() {
         fields.forEach(Field::restart);
     }
 
