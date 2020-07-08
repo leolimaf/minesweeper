@@ -2,14 +2,16 @@ package br.com.leolimaf.minesweeper.model;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
-public class Board {
+public class Board implements ObserverField {
 
-    private int lines;
-    private int columns;
-    private int mines;
+    private final int lines;
+    private final int columns;
+    private final int mines;
 
     private final List<Field> fields = new ArrayList<>();
+    private final List<Consumer<Boolean>> observers = new ArrayList<>();
 
     public Board(int lines, int columns, int mines) {
         this.lines = lines;
@@ -24,7 +26,9 @@ public class Board {
     private void gerateFields() {
         for (int i = 0; i < lines; i++) {
             for (int j = 0; j < columns; j++) {
-                fields.add(new Field(i, j));
+                Field field = new Field(i, j);
+                field.registerObserver(this);
+                fields.add(field);
             }
         }
     }
@@ -41,22 +45,37 @@ public class Board {
         long armedMines = 0;
         do {
             int random = (int) (Math.random() * fields.size());
-            fields.get(random);
+            fields.get(random).undermine();
             armedMines = fields.stream().filter(Field::isUndermined).count();
         } while (armedMines < mines);
     }
 
+    public void registerObserver(Consumer<Boolean> observer) {
+        observers.add(observer);
+    }
+
+    private void notifyObservers(boolean result) {
+        observers.forEach(o -> o.accept(result));
+    }
+
     public void open(int line, int column) {
-        try {
-            fields.parallelStream()
-                    .filter(field -> field.getLine() == line && field.getColumn() == column)
-                    .findFirst()
-                    .ifPresent(Field::open);
-        } catch (Exception e) {
-            //FIXME
-            fields.forEach(field -> field.setOpen(true));
-            throw e;
-        }
+        fields.parallelStream()
+                .filter(field -> field.getLine() == line && field.getColumn() == column)
+                .findFirst()
+                .ifPresent(Field::open);
+    }
+
+    private void showMines() {
+        fields.stream()
+                .filter(Field::isUndermined)
+                .forEach(field -> field.setOpen(true));
+    }
+
+    public void changeMarkup(int line, int column) {
+        fields.parallelStream()
+                .filter(field -> field.getLine() == line && field.getColumn() == column)
+                .findFirst()
+                .ifPresent(Field::changeMarkup);
     }
 
     public boolean goalAchieved() {
@@ -68,4 +87,14 @@ public class Board {
     }
 
 
+    @Override
+    public void eventOccurred(Field field, EventField eventField) {
+        if (eventField == EventField.EXPLODE) {
+            System.out.println("you lose");
+            notifyObservers(false);
+        } else if (goalAchieved()) {
+            System.out.println("you win");
+            notifyObservers(true);
+        }
+    }
 }

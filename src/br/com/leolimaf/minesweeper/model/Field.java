@@ -12,8 +12,8 @@ public class Field {
     private boolean undermined;
     private boolean marked;
 
-    private List<Field> neighbors = new ArrayList<>();
-    private List<ObserverField> observers = new ArrayList<>();
+    private final List<Field> neighbors = new ArrayList<>();
+    private final List<ObserverField> observers = new ArrayList<>();
 
     public Field(int line, int column) {
         this.line = line;
@@ -78,20 +78,17 @@ public class Field {
         }
     }
 
-    boolean open() {
+    void open() {
         if (!open && !marked) {
 
             if (undermined) {
                 notifyObservers(EventField.EXPLODE);
-                return true;
+                return;
             }
             setOpen(true);
             if (safeNeighborhood()) {
                 neighbors.forEach(Field::open);
             }
-            return true;
-        } else {
-            return false;
         }
 
     }
