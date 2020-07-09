@@ -2,6 +2,7 @@ package br.com.leolimaf.minesweeper.model;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 public class Field {
 
@@ -59,8 +60,8 @@ public class Field {
         return undermined;
     }
 
-    void addNeighbor(Field neighbor) {
-        if (neighbor == null) return;
+    boolean addNeighbor(Field neighbor) {
+        if (neighbor == null) return false;
 
         boolean differentLine = line != neighbor.line;
         boolean differentColumn = column != neighbor.column;
@@ -72,9 +73,13 @@ public class Field {
 
         if (generalDelta == 1 && !isDiagonal) {
             neighbors.add(neighbor);
+            return true;
         }
         if (generalDelta == 2 && isDiagonal) {
             neighbors.add(neighbor);
+            return true;
+        } else {
+            return false;
         }
     }
 
@@ -94,7 +99,7 @@ public class Field {
     }
 
     boolean safeNeighborhood() {
-        return neighbors.stream().noneMatch(field -> field.undermined);
+        return neighbors.stream().noneMatch(Field::isUndermined);
     }
 
     boolean goalAchieved() {
@@ -105,7 +110,7 @@ public class Field {
     }
 
     long minesInTheNeighborhood() {
-        return neighbors.stream().filter(field -> field.undermined).count();
+        return neighbors.stream().filter(Field::isUndermined).count();
     }
 
     void restart() {
@@ -120,4 +125,9 @@ public class Field {
             notifyObservers(EventField.OPEN);
         }
     }
+
+    public boolean isOpen() {
+        return open;
+    }
+
 }

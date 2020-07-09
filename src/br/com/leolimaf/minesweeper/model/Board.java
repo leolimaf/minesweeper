@@ -18,12 +18,12 @@ public class Board implements ObserverField {
         this.columns = columns;
         this.mines = mines;
 
-        gerateFields();
+        genarateFields();
         associateNeighbors();
         drawMines();
     }
 
-    private void gerateFields() {
+    private void genarateFields() {
         for (int i = 0; i < lines; i++) {
             for (int j = 0; j < columns; j++) {
                 Field field = new Field(i, j);
@@ -48,6 +48,14 @@ public class Board implements ObserverField {
             fields.get(random).undermine();
             armedMines = fields.stream().filter(Field::isUndermined).count();
         } while (armedMines < mines);
+    }
+
+    public int getLines() {
+        return lines;
+    }
+
+    public int getColumns() {
+        return columns;
     }
 
     public void registerObserver(Consumer<Boolean> observer) {
@@ -86,7 +94,6 @@ public class Board implements ObserverField {
         fields.forEach(Field::restart);
     }
 
-
     @Override
     public void eventOccurred(Field field, EventField eventField) {
         if (eventField == EventField.EXPLODE) {
@@ -96,5 +103,9 @@ public class Board implements ObserverField {
             System.out.println("you win");
             notifyObservers(true);
         }
+    }
+
+    public void forEachField(Consumer<Field> function){
+        fields.forEach(function);
     }
 }
