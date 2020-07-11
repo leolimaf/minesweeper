@@ -97,10 +97,9 @@ public class Board implements ObserverField {
     @Override
     public void eventOccurred(Field field, EventField eventField) {
         if (eventField == EventField.EXPLODE) {
-            System.out.println("you lose");
+            showMines();
             notifyObservers(false);
         } else if (goalAchieved()) {
-            System.out.println("you win");
             notifyObservers(true);
         }
     }
