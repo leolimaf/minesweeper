@@ -5,8 +5,8 @@ import java.util.List;
 
 public class Field {
 
-    private final int line;
-    private final int column;
+    private int line;
+    private int column;
 
     private boolean open;
     private boolean undermined;
@@ -129,4 +129,7 @@ public class Field {
         return open;
     }
 
+    public List<Field> getNeighbors() {
+        return neighbors;
+    }
 }

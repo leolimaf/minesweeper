@@ -6,9 +6,9 @@ import java.util.function.Consumer;
 
 public class Board implements ObserverField {
 
-    private final int lines;
-    private final int columns;
-    private final int mines;
+    private int lines;
+    private int columns;
+    private int mines;
 
     private final List<Field> fields = new ArrayList<>();
     private final List<Consumer<Boolean>> observers = new ArrayList<>();
@@ -73,7 +73,7 @@ public class Board implements ObserverField {
                 .ifPresent(Field::open);
     }
 
-    private void showMines() {
+    public void showMines() {
         fields.stream()
                 .filter(Field::isUndermined)
                 .forEach(field -> field.setOpen(true));
@@ -106,5 +106,9 @@ public class Board implements ObserverField {
 
     public void forEachField(Consumer<Field> function){
         fields.forEach(function);
+    }
+
+    public List<Field> getFields() {
+        return fields;
     }
 }
