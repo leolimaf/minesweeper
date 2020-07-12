@@ -17,7 +17,7 @@ public class TestBoard {
     @Test
     void testGenarateFields() {
 
-        boolean qntFields = board.getFields().size() == 25;
+        boolean qntFields = board.getFIELDS().size() == 25;
 
         assertTrue(qntFields);
     }
@@ -25,8 +25,8 @@ public class TestBoard {
     @Test
     void testAssociateNeighbors() {
 
-        boolean qntNeighbors1 = board.getFields().get(12).getNeighbors().size() == 8;
-        boolean qntNeighbors2 = board.getFields().get(10).getNeighbors().size() == 5;
+        boolean qntNeighbors1 = board.getFIELDS().get(12).getNeighbors().size() == 8;
+        boolean qntNeighbors2 = board.getFIELDS().get(10).getNeighbors().size() == 5;
 
         assertTrue(qntNeighbors1 && qntNeighbors2);
     }
@@ -34,7 +34,7 @@ public class TestBoard {
     @Test
     void testDrawMines() {
         int qntMines = 0;
-        for (Field field : board.getFields()) {
+        for (Field field : board.getFIELDS()) {
             if (field.isUndermined()) {
                 qntMines++;
             }
@@ -44,7 +44,7 @@ public class TestBoard {
 
     @Test
     void testGoalAchieved() {
-        for (Field field : board.getFields()) {
+        for (Field field : board.getFIELDS()) {
             if (!field.isOpen() && !field.isUndermined()) {
                 field.open();
             }
@@ -57,7 +57,7 @@ public class TestBoard {
 
     @Test
     void testRestart(){
-        for (Field field : board.getFields()) {
+        for (Field field : board.getFIELDS()) {
             if (field.isUndermined()){
                 field.changeMarkup();
             } else {
@@ -65,13 +65,13 @@ public class TestBoard {
             }
         }
         board.restart();
-        assertTrue(board.getFields().stream().noneMatch(Field::goalAchieved));
+        assertTrue(board.getFIELDS().stream().noneMatch(Field::goalAchieved));
     }
 
     @Test
     void testShowMines(){
         board.showMines();
-        boolean openMinefields = board.getFields()
+        boolean openMinefields = board.getFIELDS()
                 .stream()
                 .filter(Field::isUndermined)
                 .allMatch(Field::isOpen);

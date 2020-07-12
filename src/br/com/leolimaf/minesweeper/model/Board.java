@@ -6,17 +6,17 @@ import java.util.function.Consumer;
 
 public class Board implements ObserverField {
 
-    private int lines;
-    private int columns;
-    private int mines;
+    private final int LINES;
+    private final int COLUMNS;
+    private final int MINES;
 
-    private final List<Field> fields = new ArrayList<>();
-    private final List<Consumer<Boolean>> observers = new ArrayList<>();
+    private final List<Field> FIELDS = new ArrayList<>();
+    private final List<Consumer<Boolean>> OBSERVERS = new ArrayList<>();
 
-    public Board(int lines, int columns, int mines) {
-        this.lines = lines;
-        this.columns = columns;
-        this.mines = mines;
+    public Board(int LINES, int COLUMNS, int MINES) {
+        this.LINES = LINES;
+        this.COLUMNS = COLUMNS;
+        this.MINES = MINES;
 
         genarateFields();
         associateNeighbors();
@@ -24,18 +24,18 @@ public class Board implements ObserverField {
     }
 
     private void genarateFields() {
-        for (int i = 0; i < lines; i++) {
-            for (int j = 0; j < columns; j++) {
+        for (int i = 0; i < LINES; i++) {
+            for (int j = 0; j < COLUMNS; j++) {
                 Field field = new Field(i, j);
                 field.registerObserver(this);
-                fields.add(field);
+                FIELDS.add(field);
             }
         }
     }
 
     private void associateNeighbors() {
-        for (Field field1 : fields) {
-            for (Field field2 : fields) {
+        for (Field field1 : FIELDS) {
+            for (Field field2 : FIELDS) {
                 field1.addNeighbor(field2);
             }
         }
@@ -44,54 +44,41 @@ public class Board implements ObserverField {
     private void drawMines() {
         long armedMines = 0;
         do {
-            int random = (int) (Math.random() * fields.size());
-            fields.get(random).undermine();
-            armedMines = fields.stream().filter(Field::isUndermined).count();
-        } while (armedMines < mines);
+            int random = (int) (Math.random() * FIELDS.size());
+            FIELDS.get(random).undermine();
+            armedMines = FIELDS.stream().filter(Field::isUndermined).count();
+        } while (armedMines < MINES);
     }
 
-    public int getLines() {
-        return lines;
+    public int getLINES() {
+        return LINES;
     }
 
-    public int getColumns() {
-        return columns;
+    public int getCOLUMNS() {
+        return COLUMNS;
     }
 
     public void registerObserver(Consumer<Boolean> observer) {
-        observers.add(observer);
+        OBSERVERS.add(observer);
     }
 
-    private void notifyObservers(boolean result) {
-        observers.forEach(o -> o.accept(result));
-    }
-
-    public void open(int line, int column) {
-        fields.parallelStream()
-                .filter(field -> field.getLine() == line && field.getColumn() == column)
-                .findFirst()
-                .ifPresent(Field::open);
+    public void notifyObservers(boolean result) {
+        OBSERVERS.forEach(o -> o.accept(result));
     }
 
     public void showMines() {
-        fields.stream()
+        FIELDS.stream()
                 .filter(Field::isUndermined)
                 .forEach(field -> field.setOpen(true));
     }
 
-    public void changeMarkup(int line, int column) {
-        fields.parallelStream()
-                .filter(field -> field.getLine() == line && field.getColumn() == column)
-                .findFirst()
-                .ifPresent(Field::changeMarkup);
-    }
-
     public boolean goalAchieved() {
-        return fields.stream().allMatch(Field::goalAchieved);
+        return FIELDS.stream().allMatch(Field::goalAchieved);
     }
 
     public void restart() {
-        fields.forEach(Field::restart);
+        FIELDS.forEach(Field::restart);
+        drawMines();
     }
 
     @Override
@@ -99,16 +86,18 @@ public class Board implements ObserverField {
         if (eventField == EventField.EXPLODE) {
             showMines();
             notifyObservers(false);
-        } else if (goalAchieved()) {
+            return;
+        }
+        if (goalAchieved()) {
             notifyObservers(true);
         }
     }
 
     public void forEachField(Consumer<Field> function){
-        fields.forEach(function);
+        FIELDS.forEach(function);
     }
 
-    public List<Field> getFields() {
-        return fields;
+    public List<Field> getFIELDS() {
+        return FIELDS;
     }
 }

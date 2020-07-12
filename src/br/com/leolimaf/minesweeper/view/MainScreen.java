@@ -9,12 +9,12 @@ public class MainScreen extends JFrame {
 
     public MainScreen() throws HeadlessException {
 
-        Board board = new Board(16,30,50);
+        Board board = new Board(17,28,50);
 
         add(new BoardPanel(board));
 
         setTitle("Minesweeper");
-        setSize(690,448);
+        setSize(850,548);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setVisible(true);

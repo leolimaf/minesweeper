@@ -11,20 +11,20 @@ import java.awt.event.MouseListener;
 
 public class ButtonField extends JButton implements ObserverField, MouseListener {
 
-    private Field field;
+    private final Field FIELD;
     private final Color BG_DEFAULT = new Color(201, 201, 201);
     private final Color BG_MARK = new Color(8, 179, 247);
     private final Color BG_EXPLODE = new Color(234, 19, 20);
     private final Color GREEN_TEXT = new Color(0, 121, 0);
 
-    public ButtonField(Field field) {
-        field.registerObserver(this);
-        this.field = field;
+    public ButtonField(Field FIELD) {
+        FIELD.registerObserver(this);
+        this.FIELD = FIELD;
         setBackground(BG_DEFAULT);
         setBorder(BorderFactory.createBevelBorder(0));
 
         addMouseListener(this);
-        field.registerObserver(this);
+        FIELD.registerObserver(this);
     }
 
     @Override
@@ -42,18 +42,22 @@ public class ButtonField extends JButton implements ObserverField, MouseListener
             default:
                 applyDefaultStyle();
         }
+        SwingUtilities.invokeLater(() -> {
+            repaint();
+            validate();
+        });
     }
 
     private void applyOpenStyle() {
         setBorder(BorderFactory.createLineBorder(Color.GRAY));
-        if (field.isUndermined()) {
+        if (FIELD.isUndermined()) {
             ImageIcon icon = new ImageIcon(getClass().getResource("/images/mine.png"));
             Image imgScale = icon.getImage().getScaledInstance(getWidth(), getHeight(), Image.SCALE_SMOOTH);
             setIcon(new ImageIcon(imgScale));
             return;
         }
         setBackground(BG_DEFAULT);
-        switch (field.minesInTheNeighborhood()) {
+        switch (FIELD.minesInTheNeighborhood()) {
             case 1:
                 setForeground(GREEN_TEXT);
                 break;
@@ -65,7 +69,7 @@ public class ButtonField extends JButton implements ObserverField, MouseListener
                 setForeground(Color.RED);
         }
         setFont(new Font("Arial", Font.PLAIN, 18));
-        String value = !field.safeNeighborhood() ? field.minesInTheNeighborhood() + "" : "";
+        String value = !FIELD.safeNeighborhood() ? FIELD.minesInTheNeighborhood() + "" : "";
         setText(value);
     }
 
@@ -88,15 +92,16 @@ public class ButtonField extends JButton implements ObserverField, MouseListener
         setBackground(BG_DEFAULT);
         setText("");
         setIcon(null);
+        setBorder(BorderFactory.createBevelBorder(0));
     }
 
     @Override
     public void mousePressed(MouseEvent e) {
         if (e.getButton() == 1) {
-            field.open();
+            FIELD.open();
         }
         if (e.getButton() == 3) {
-            field.changeMarkup();
+            FIELD.changeMarkup();
         }
     }
 

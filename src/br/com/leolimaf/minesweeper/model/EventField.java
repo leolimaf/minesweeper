@@ -2,6 +2,6 @@ package br.com.leolimaf.minesweeper.model;
 
 public enum EventField {
 
-    OPEN, MARK, MARKOFF, EXPLODE
+    OPEN, MARK, MARKOFF, EXPLODE, RESTART
 
 }

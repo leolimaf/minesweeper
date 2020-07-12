@@ -5,8 +5,8 @@ import java.util.List;
 
 public class Field {
 
-    private int line;
-    private int column;
+    private final int LINE;
+    private final int COLUMN;
 
     private boolean open;
     private boolean undermined;
@@ -15,9 +15,9 @@ public class Field {
     private final List<Field> neighbors = new ArrayList<>();
     private final List<ObserverField> observers = new ArrayList<>();
 
-    public Field(int line, int column) {
-        this.line = line;
-        this.column = column;
+    public Field(int LINE, int COLUMN) {
+        this.LINE = LINE;
+        this.COLUMN = COLUMN;
     }
 
     public void registerObserver(ObserverField observer){
@@ -26,14 +26,6 @@ public class Field {
 
     private void notifyObservers(EventField event){
         observers.forEach(observerField -> observerField.eventOccurred(this, event));
-    }
-
-    public int getLine() {
-        return line;
-    }
-
-    public int getColumn() {
-        return column;
     }
 
     public void changeMarkup() {
@@ -62,15 +54,15 @@ public class Field {
     boolean addNeighbor(Field neighbor) {
         if (neighbor == null) return false;
 
-        boolean differentLine = line != neighbor.line;
-        boolean differentColumn = column != neighbor.column;
+        boolean differentLine = LINE != neighbor.LINE;
+        boolean differentColumn = COLUMN != neighbor.COLUMN;
         boolean isDiagonal = differentLine && differentColumn;
 
-        int deltaLine = Math.abs(line - neighbor.line);
-        int deltaColumn = Math.abs(column - neighbor.column);
+        int deltaLine = Math.abs(LINE - neighbor.LINE);
+        int deltaColumn = Math.abs(COLUMN - neighbor.COLUMN);
         int generalDelta = deltaLine + deltaColumn;
 
-        if (generalDelta == 1 && !isDiagonal) {
+        if (generalDelta == 1) {
             neighbors.add(neighbor);
             return true;
         }
@@ -116,6 +108,7 @@ public class Field {
         open = false;
         undermined = false;
         marked = false;
+        notifyObservers(EventField.RESTART);
     }
 
     public void setOpen(boolean open) {

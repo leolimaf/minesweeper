@@ -7,17 +7,22 @@ import java.awt.*;
 
 public class BoardPanel extends JPanel {
 
-    public BoardPanel(Board board){
+    public BoardPanel(Board board) {
 
-        setLayout(new GridLayout(board.getLines(), board.getColumns()));
+        setLayout(new GridLayout(board.getLINES(), board.getCOLUMNS()));
 
         board.forEachField(buttonField -> add(new ButtonField(buttonField)));
 
         board.registerObserver(e -> {
-            //TODO show the result to the user
+            SwingUtilities.invokeLater(() -> {
+                if (e) {
+                    JOptionPane.showMessageDialog(this, "Parabéns!\nVocê venceu :)");
+                } else {
+                    JOptionPane.showMessageDialog(this, "Que pena!\nVocê perdeu :(");
+                }
+                board.restart();
+            });
         });
-
-
 
     }
 
