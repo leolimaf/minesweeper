@@ -14,10 +14,11 @@ public class MainScreen extends JFrame {
         add(new BoardPanel(board));
 
         setTitle("Minesweeper");
-        setSize(850,548);
+        setSize(1050,670);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setVisible(true);
+        setIconImage(new ImageIcon((getClass().getResource("/images/mine.png"))).getImage());
 
     }
 
