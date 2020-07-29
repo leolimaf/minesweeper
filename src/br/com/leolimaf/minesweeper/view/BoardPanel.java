@@ -13,16 +13,14 @@ public class BoardPanel extends JPanel {
 
         board.forEachField(buttonField -> add(new ButtonField(buttonField)));
 
-        board.registerObserver(e -> {
-            SwingUtilities.invokeLater(() -> {
-                if (e) {
-                    JOptionPane.showMessageDialog(this, "Parabéns!\nVocê venceu :)");
-                } else {
-                    JOptionPane.showMessageDialog(this, "Que pena!\nVocê perdeu :(");
-                }
-                board.restart();
-            });
-        });
+        board.registerObserver(e -> SwingUtilities.invokeLater(() -> {
+            if (e) {
+                JOptionPane.showMessageDialog(this, "Parabéns!\nVocê venceu :)");
+            } else {
+                JOptionPane.showMessageDialog(this, "Que pena!\nVocê perdeu :(");
+            }
+            board.restart();
+        }));
 
     }
 

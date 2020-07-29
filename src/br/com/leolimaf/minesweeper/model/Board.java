@@ -42,7 +42,7 @@ public class Board implements ObserverField {
     }
 
     private void drawMines() {
-        long armedMines = 0;
+        long armedMines;
         do {
             int random = (int) (Math.random() * FIELDS.size());
             FIELDS.get(random).undermine();
