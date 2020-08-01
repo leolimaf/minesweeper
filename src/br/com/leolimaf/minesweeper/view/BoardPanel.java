@@ -15,9 +15,9 @@ public class BoardPanel extends JPanel {
 
         board.registerObserver(e -> SwingUtilities.invokeLater(() -> {
             if (e) {
-                JOptionPane.showMessageDialog(this, "Parabéns!\nVocê venceu :)");
+                JOptionPane.showMessageDialog(this, "Congratulations!\nYou won :)");
             } else {
-                JOptionPane.showMessageDialog(this, "Que pena!\nVocê perdeu :(");
+                JOptionPane.showMessageDialog(this, "Too bad!\nYou lost :(");
             }
             board.restart();
         }));
